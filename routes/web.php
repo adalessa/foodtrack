@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\FoodController;
+use App\Http\Controllers\MealController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +17,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::post("meals", [MealController::class, 'store']);
+    Route::put("meals/{meal}", [MealController::class, 'update']);
+    Route::delete("meals/{meal}", [MealController::class, 'destroy']);
+
+    Route::post('foods', [FoodController::class, 'store']);
+    Route::put('foods/{food}', [FoodController::class, 'update']);
 });
