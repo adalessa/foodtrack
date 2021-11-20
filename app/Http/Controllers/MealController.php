@@ -2,18 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MealType;
 use App\Models\Food;
 use App\Models\Meal;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class MealController extends Controller
 {
+    public function index()
+    {
+        return view('meals.index');
+    }
+
+    public function create(Request $request)
+    {
+        return view('meals.create', [
+            'types' => MealType::cases(),
+            'foods' => $request->user()->foods,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validData = $request->validate([
             'date' => 'required',
             'food_id' => 'required|exists:foods,id',
-            'type' => 'required',
+            'type' => [
+                'required',
+                Rule::in(MealType::toValues()),
+            ],
         ]);
 
         $food = Food::find($validData['food_id']);
@@ -23,7 +41,7 @@ class MealController extends Controller
             'user_id' => $request->user()->id,
             'food_id' => $food->id,
             'date' => $validData['date'],
-            'type' => $validData['type'],
+            'type' => MealType::from($validData['type']),
         ]);
 
         return response()

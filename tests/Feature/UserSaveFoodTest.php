@@ -1,11 +1,13 @@
 <?php
 
+use App\Enums\MealType;
 use App\Models\Food;
 use App\Models\Meal;
 use App\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Faker\faker;
+use function Pest\Laravel\withoutExceptionHandling;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertTrue;
 
@@ -20,7 +22,7 @@ test('user can save a food for a meal in a date ', function () {
     actingAs($user)->post('/meals', [
         'date' => $date = faker()->date(),
         'food_id' => $food->id,
-        'type' => 'almuerzo',
+        'type' => MealType::lunch()->value,
     ])->assertSessionDoesntHaveErrors()
         ->assertSessionHas('record', 1);
 
@@ -28,7 +30,8 @@ test('user can save a food for a meal in a date ', function () {
     $meal = $user->meals->first();
     assertTrue($meal->food->is($food));
     expect($meal->date)->toBe($date);
-    expect($meal->type)->toBe('almuerzo');
+    expect($meal->type)->toBeInstanceOf(MealType::class);
+    expect($meal->type->value)->toBe(MealType::lunch()->value);
 });
 
 test('user can update a meal', function () {
@@ -97,7 +100,7 @@ test('user can not use a food from other user', function () {
     actingAs($user)->post('/meals', [
         'date' => faker()->date(),
         'food_id' => $food->id,
-        'type' => 'almuerzo',
+        'type' => MealType::lunch()->value,
     ])->assertForbidden();
 });
 

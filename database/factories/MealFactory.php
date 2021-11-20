@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\MealType;
 use App\Models\Food;
 use App\Models\Meal;
 use App\Models\User;
@@ -27,7 +28,7 @@ class MealFactory extends Factory
             'user_id' => User::factory(),
             'food_id' => Food::factory(),
             'date' => $this->faker->date(),
-            'type' => $this->faker->randomElement(['almuerzo', 'cena']),
+            'type' => $this->faker->randomElement(MealType::cases()),
         ];
     }
 }

@@ -20,7 +20,7 @@ class CreateMealsTable extends Migration
             $table->foreignIdFor(User::class);
             $table->foreignIdFor(Food::class);
             $table->date('date');
-            $table->string('type');
+            $table->unsignedTinyInteger('type');
             $table->timestamps();
 
             $table->unique(['user_id', 'date', 'type']);

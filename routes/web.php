@@ -24,9 +24,8 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 })->name('dashboard');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::post("meals", [MealController::class, 'store']);
-    Route::put("meals/{meal}", [MealController::class, 'update']);
-    Route::delete("meals/{meal}", [MealController::class, 'destroy']);
-
-    Route::resource('foods', FoodController::class);
+    Route::resources([
+        'foods' => FoodController::class,
+        'meals' => MealController::class,
+    ]);
 });
