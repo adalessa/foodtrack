@@ -12,9 +12,11 @@ class FoodController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        return view('foods.index', [
+            'foods' => $request->user()->foods,
+        ]);
     }
 
     /**
@@ -24,7 +26,7 @@ class FoodController extends Controller
      */
     public function create()
     {
-        //
+        return view('foods.create');
     }
 
     /**
@@ -55,7 +57,7 @@ class FoodController extends Controller
      */
     public function show(Food $food)
     {
-        //
+        return view('foods.show', compact('food'));
     }
 
     /**
@@ -66,7 +68,7 @@ class FoodController extends Controller
      */
     public function edit(Food $food)
     {
-        //
+        return view('foods.edit', compact('food'));
     }
 
     /**

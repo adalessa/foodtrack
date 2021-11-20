@@ -28,6 +28,5 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::put("meals/{meal}", [MealController::class, 'update']);
     Route::delete("meals/{meal}", [MealController::class, 'destroy']);
 
-    Route::post('foods', [FoodController::class, 'store']);
-    Route::put('foods/{food}', [FoodController::class, 'update']);
+    Route::resource('foods', FoodController::class);
 });
