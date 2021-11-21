@@ -13,6 +13,15 @@ class Meal extends Model
 
     protected $guarded = [''];
 
+    protected $casts = [
+        'date' => 'date',
+    ];
+
+    public function scopeRange($query, $from, $to)
+    {
+        return $query->whereBetween('date', [$from, $to]);
+    }
+
     public function food(): BelongsTo
     {
         return $this->belongsTo(Food::class);

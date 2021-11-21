@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\MealController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,7 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 })->name('dashboard');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/calendar', [CalendarController::class, 'index']);
     Route::resources([
         'foods' => FoodController::class,
         'meals' => MealController::class,
