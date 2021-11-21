@@ -1,39 +1,47 @@
 <?php
 
+namespace Tests\Feature;
+
 use App\Models\Food;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-use function Pest\Laravel\actingAs;
-use function PHPUnit\Framework\assertCount;
+class UserCreateFoodTest extends TestCase
+{
+    use RefreshDatabase;
 
-test('user can create a food', function () {
-    /** @var User **/
-    $user = User::factory()->create();
+    public function test_user_can_create_a_food()
+    {
+        /** @var User **/
+        $user = User::factory()->create();
+        $this->actingAs($user)
+            ->post('/foods', [
+                'name' => "Milanesa con pure",
+            ])
+            ->assertSessionDoesntHaveErrors()
+            ->assertRedirect('foods');
+        ;
 
-    actingAs($user)
-        ->post('/foods', [
-            'name' => "Milanesa con pure",
-        ])
-        ->assertSessionDoesntHaveErrors()
-        ->assertRedirect('foods');
+        $this->assertCount(1, $user->foods);
+    }
 
-    assertCount(1, $user->foods);
-});
+    public function test_user_can_update_a_food()
+    {
+        /** @var User **/
+        $user = User::factory()->create();
+        $food = Food::factory()->create([
+            'user_id' => $user->id,
+        ]);
 
-test('user can update a food', function () {
-    /** @var User **/
-    $user = User::factory()->create();
-    $food = Food::factory()->create([
-        'user_id' => $user->id,
-    ]);
+        $this->actingAs($user)
+            ->put('/foods/' . $food->id, [
+                'name' => "Milanesa con pure",
+            ])
+            ->assertSessionDoesntHaveErrors()
+            ->assertRedirect('foods');
 
-    actingAs($user)
-        ->put('/foods/' . $food->id, [
-            'name' => "Milanesa con pure",
-        ])
-        ->assertSessionDoesntHaveErrors()
-        ->assertRedirect('foods');
-
-    $food->refresh();
-    expect($food->name)->toBe('Milanesa con pure');
-});
+        $food->refresh();
+        $this->assertEquals('Milanesa con pure', $food->name);
+    }
+}
