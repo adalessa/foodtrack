@@ -1,47 +1,39 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\Food;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class UserCreateFoodTest extends TestCase
-{
-    use RefreshDatabase;
+use function Pest\Laravel\actingAs;
+use function PHPUnit\Framework\assertCount;
 
-    public function test_user_can_create_a_food()
-    {
-        /** @var User **/
-        $user = User::factory()->create();
-        $this->actingAs($user)
-            ->post('/foods', [
-                'name' => "Milanesa con pure",
-            ])
-            ->assertSessionDoesntHaveErrors()
-            ->assertRedirect('foods');
-        ;
+test('user can create a food', function () {
+    /** @var User **/
+    $user = User::factory()->create();
 
-        $this->assertCount(1, $user->foods);
-    }
+    actingAs($user)
+        ->post('/foods', [
+            'name' => "Milanesa con pure",
+        ])
+        ->assertSessionDoesntHaveErrors()
+        ->assertRedirect('foods');
 
-    public function test_user_can_update_a_food()
-    {
-        /** @var User **/
-        $user = User::factory()->create();
-        $food = Food::factory()->create([
-            'user_id' => $user->id,
-        ]);
+    assertCount(1, $user->foods);
+});
 
-        $this->actingAs($user)
-            ->put('/foods/' . $food->id, [
-                'name' => "Milanesa con pure",
-            ])
-            ->assertSessionDoesntHaveErrors()
-            ->assertRedirect('foods');
+test('user can update a food', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $food = Food::factory()->create([
+        'user_id' => $user->id,
+    ]);
 
-        $food->refresh();
-        $this->assertEquals('Milanesa con pure', $food->name);
-    }
-}
+    actingAs($user)
+        ->put('/foods/' . $food->id, [
+            'name' => "Milanesa con pure",
+        ])
+        ->assertSessionDoesntHaveErrors()
+        ->assertRedirect('foods');
+
+    $food->refresh();
+    expect($food->name)->toBe('Milanesa con pure');
+});

@@ -15,11 +15,6 @@ class MealController extends Controller
         return view('meals.index');
     }
 
-    public function name($arg)
-    {
-
-    }
-
     public function create(Request $request)
     {
         return view('meals.create', [

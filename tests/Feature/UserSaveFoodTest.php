@@ -1,117 +1,113 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Enums\MealType;
 use App\Models\Food;
 use App\Models\Meal;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 
-class UserSaveFoodTest extends TestCase
-{
-    use RefreshDatabase, WithFaker;
+use function Pest\Laravel\actingAs;
+use function Pest\Faker\faker;
+use function Pest\Laravel\withoutExceptionHandling;
+use function PHPUnit\Framework\assertCount;
+use function PHPUnit\Framework\assertTrue;
 
-    public function test_user_can_save_a_food_for_a_meal_in_a_date() {
-        /** @var User **/
-        $user = User::factory()->create();
-        $food = Food::factory()->create([
-            'name' => 'Milanesa con pure',
-            'user_id' => $user->id,
-        ]);
+test('user can save a food for a meal in a date ', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $food = Food::factory()->create([
+        'name' => 'Milanesa con pure',
+        'user_id' => $user->id,
+    ]);
 
-        $this->actingAs($user)->post('/meals', [
-            'date' => $date = $this->faker->date(),
-            'food_id' => $food->id,
-            'type' => MealType::lunch()->value,
-        ])->assertSessionDoesntHaveErrors()
-            ->assertSessionHas('record', 1);
+    actingAs($user)->post('/meals', [
+        'date' => $date = faker()->date(),
+        'food_id' => $food->id,
+        'type' => MealType::lunch()->value,
+    ])->assertSessionDoesntHaveErrors()
+        ->assertSessionHas('record', 1);
 
-        $this->assertCount(1, $user->meals);
-        $meal = $user->meals->first();
-        $this->assertTrue($meal->food->is($food));
-        $this->assertEquals($date, $meal->date);
-        $this->assertInstanceOf(MealType::class, $meal->type);
-        $this->assertEquals(MealType::lunch()->value, $meal->type->value);
-    }
+    assertCount(1, $user->meals);
+    $meal = $user->meals->first();
+    assertTrue($meal->food->is($food));
+    expect($meal->date)->toBe($date);
+    expect($meal->type)->toBeInstanceOf(MealType::class);
+    expect($meal->type->value)->toBe(MealType::lunch()->value);
+});
 
-    public function test_user_can_update_a_meal() {
-            /** @var User **/
-            $user = User::factory()->create();
-            $food = Food::factory()->create([
-                'name' => 'Milanesa con pure',
-                'user_id' => $user->id,
-            ]);
-            $meal = Meal::factory()->create([
-                'user_id' => $user->id,
-            ]);
+test('user can update a meal', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $food = Food::factory()->create([
+        'name' => 'Milanesa con pure',
+        'user_id' => $user->id,
+    ]);
+    $meal = Meal::factory()->create([
+        'user_id' => $user->id,
+    ]);
 
-            $this->actingAs($user)->put('/meals/' . $meal->id, [
-                'food_id' => $food->id,
-            ])->assertSessionHasNoErrors()->assertRedirect('/calendar');
+    actingAs($user)->put('/meals/' . $meal->id, [
+        'food_id' => $food->id,
+    ])->assertSessionHasNoErrors()->assertRedirect('/calendar');
 
-            $meal->refresh();
-            $this->assertEquals('Milanesa con pure', $meal->food->name);
-        }
+    $meal->refresh();
+    expect($meal->food->name)->toBe('Milanesa con pure');
+});
 
-        public function test_user_can_not_update_a_meal_from_another_user() {
-            /** @var User **/
-            $user = User::factory()->create();
-            $food = Food::factory()->create([
-                'name' => 'Milanesa con pure',
-                'user_id' => $user->id,
-            ]);
-            $meal = Meal::factory()->create();
+test('user can not update a meal from another user', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $food = Food::factory()->create([
+        'name' => 'Milanesa con pure',
+        'user_id' => $user->id,
+    ]);
+    $meal = Meal::factory()->create();
 
-            $this->actingAs($user)->put('/meals/' . $meal->id, [
-                'food_id' => $food->id,
-            ])->assertForbidden();
-        }
+    actingAs($user)->put('/meals/' . $meal->id, [
+        'food_id' => $food->id,
+    ])->assertForbidden();
+});
 
-        public function test_user_can_not_update_a_meal_with_food_from_another_user() {
-            /** @var User **/
-            $user = User::factory()->create();
-            $food = Food::factory()->create(['name' => 'Milanesa con pure']);
-            $meal = Meal::factory()->create([
-                'user_id' => $user->id,
-            ]);
+test('user can not update a meal with food from another user', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $food = Food::factory()->create(['name' => 'Milanesa con pure']);
+    $meal = Meal::factory()->create([
+        'user_id' => $user->id,
+    ]);
 
-            $this->actingAs($user)->put('/meals/' . $meal->id, [
-                'food_id' => $food->id,
-            ])->assertForbidden();
-        }
+    actingAs($user)->put('/meals/' . $meal->id, [
+        'food_id' => $food->id,
+    ])->assertForbidden();
+});
 
-        public function test_user_can_delete_a_meal() {
-            /** @var User **/
-            $user = User::factory()->create();
-            $meal = Meal::factory()->create([
-                'user_id' => $user->id,
-            ]);
+test('user can delete a meal', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $meal = Meal::factory()->create([
+        'user_id' => $user->id,
+    ]);
 
-            $this->actingAs($user)->delete('/meals/' . $meal->id, [])->assertRedirect('/calendar');
+    actingAs($user)->delete('/meals/' . $meal->id, [])->assertRedirect('/calendar');
 
-            $this->assertCount(0, $user->meals);
-        }
+    assertCount(0, $user->meals);
+});
 
-        public function test_user_can_not_use_a_food_from_other_user() {
-            /** @var User **/
-            $user = User::factory()->create();
-            $food = Food::factory()->create(['name' => 'Milanesa con pure']);
+test('user can not use a food from other user', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $food = Food::factory()->create(['name' => 'Milanesa con pure']);
 
-            $this->actingAs($user)->post('/meals', [
-                'date' => $this->faker->date(),
-                'food_id' => $food->id,
-                'type' => MealType::lunch()->value,
-            ])->assertForbidden();
-        }
+    actingAs($user)->post('/meals', [
+        'date' => faker()->date(),
+        'food_id' => $food->id,
+        'type' => MealType::lunch()->value,
+    ])->assertForbidden();
+});
 
-        public function test_user_can_not_delete_a_meal_from_another_user() {
-            /** @var User **/
-            $user = User::factory()->create();
-            $meal = Meal::factory()->create();
+test('user can not delete a meal from another user', function () {
+    /** @var User **/
+    $user = User::factory()->create();
+    $meal = Meal::factory()->create();
 
-            $this->actingAs($user)->delete('/meals/' . $meal->id, [])->assertForbidden();
-        }
-}
+    actingAs($user)->delete('/meals/' . $meal->id, [])->assertForbidden();
+});
