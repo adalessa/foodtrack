@@ -1,12 +1,12 @@
 <?php
 
 use App\Models\Food;
-use App\Models\User;
+use App\Models\Meal;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMealsTable extends Migration
+class CreateFoodMealTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,14 +15,12 @@ class CreateMealsTable extends Migration
      */
     public function up()
     {
-        Schema::create('meals', function (Blueprint $table) {
+        Schema::create('food_meal', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class);
-            $table->date('date');
-            $table->unsignedTinyInteger('type');
+            $table->foreignIdFor(Meal::class);
+            $table->foreignIdFor(Food::class);
             $table->timestamps();
-
-            $table->unique(['user_id', 'date', 'type']);
+            $table->unique(['meal_id', 'food_id']);
         });
     }
 
@@ -33,6 +31,6 @@ class CreateMealsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('meals');
+        Schema::dropIfExists('food_meal');
     }
 }

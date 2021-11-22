@@ -27,40 +27,43 @@ class MealController extends Controller
     {
         $validData = $request->validate([
             'date' => 'required',
-            'food_id' => 'required|exists:foods,id',
+            'foods.*' => 'required|exists:foods,id',
             'type' => [
                 'required',
                 Rule::in(MealType::toValues()),
             ],
         ]);
 
-        $food = Food::find($validData['food_id']);
-        $this->authorize('view', $food);
-
         $meal = Meal::create([
             'user_id' => $request->user()->id,
-            'food_id' => $food->id,
             'date' => $validData['date'],
             'type' => MealType::from($validData['type']),
         ]);
+
+        $meal->foods()->sync($validData['foods']);
 
         return response()
             ->redirectTo('/calendar')
             ->with('record', $meal->id);
     }
 
+    public function edit(Meal $meal, Request $request)
+    {
+        return view('meals.edit', [
+            'types' => MealType::cases(),
+            'foods' => $request->user()->foods,
+            'meal' => $meal,
+        ]);
+    }
+
     public function update(Meal $meal, Request $request)
     {
         $this->authorize('update', $meal);
         $validData = $request->validate([
-            'food_id' => 'required|exists:foods,id',
+            'foods.*' => 'required|exists:foods,id',
         ]);
 
-        $food = Food::find($validData['food_id']);
-        $this->authorize('view', $food);
-
-        $meal->food_id = $food->id;
-        $meal->save();
+        $meal->foods()->sync($validData['foods']);
 
         return response()
             ->redirectTo('/calendar')

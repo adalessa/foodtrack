@@ -1,28 +1,29 @@
 <?php
 
-namespace Tests\Feature;
-
+use App\Models\Meal;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class CalendarTest extends TestCase
-{
-    use RefreshDatabase;
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\withoutExceptionHandling;
+use function PHPUnit\Framework\assertCount;
+use function PHPUnit\Framework\assertEquals;
 
-    public function test_calendar_returns_meals()
-    {
-        $this->withoutExceptionHandling();
-        /** @var User */
-        $user = User::factory()->create();
+it('returns the meals for the current month', function () {
+    /** @var User */
+    $user = User::factory()
+        ->withPersonalTeam()
+        ->has(Meal::factory()->count(15))
+        ->create()
+    ;
 
-        $response = $this->actingAs($user)
-            ->get('/calendar')
-            ->assertViewHas('days')
-        ;
+    withoutExceptionHandling();
+    $response = actingAs($user)
+        ->get('/calendar')
+        ->assertViewHas('calendar')
+    ;
 
-        $days = $response->viewData('days');
+    $calendar = $response->viewData('calendar');
 
-        $this->assertCount(now()->daysInMonth, $days);
-    }
-}
+    assertCount(now()->daysInMonth, $calendar->days());
+    assertEquals($user->meals->count(), $calendar->meals()->flatten()->count());
+});

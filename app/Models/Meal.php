@@ -6,6 +6,7 @@ use App\Enums\MealType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Meal extends Model
 {
@@ -22,9 +23,9 @@ class Meal extends Model
         return $query->whereBetween('date', [$from, $to]);
     }
 
-    public function food(): BelongsTo
+    public function foods(): BelongsToMany
     {
-        return $this->belongsTo(Food::class);
+        return $this->belongsToMany(Food::class);
     }
 
     public function user(): BelongsTo

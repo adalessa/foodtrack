@@ -67,6 +67,6 @@ class User extends Authenticatable
 
     public function foods(): HasMany
     {
-        return $this->hasMany(Food::class);
+        return $this->hasMany(Food::class)->orderBy('name');
     }
 }

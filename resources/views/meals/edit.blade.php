@@ -11,12 +11,13 @@
                 <div class="py-12 max-w-xl mx-auto divide-y md:max-w-4xl">
                     <h2 class="text-2xl font-bold">{{__('Create Meal')}}</h2>
                     <div class="mt-8 max-w-md">
-                        <form action="{{route('meals.store')}}" method="POST">
+                        <form action="{{route('meals.update', $meal)}}" method="POST">
                             @csrf
+                            @method('PUT')
                             <div class="grid grid-cols-1 gap-6">
                                 <label class="block">
                                     <span class="text-gray-700">@lang("Date")</span>
-                                    <input type="date" name="date" value="{{request()->get('date', old('date', now()->toDateString()))}}" class="
+                                    <input type="date" name="date" value="{{old('date', $meal->date->toDateString())}}" class="
                                                  mt-0
                                                  block
                                                  w-full
@@ -36,22 +37,22 @@
                                                    focus:ring-0 focus:border-black
                                                    ">
                                         @foreach($types as $type)
-                                            <option value="{{$type->value}}"  @if(old('type') == $type->value) selected @endif >@lang($type->label) </option>
+                                            <option value="{{$type->value}}"  @if(old('type', $meal->type->value) == $type->value) selected @endif >@lang($type->label) </option>
                                         @endforeach
                                     </select>
                                 </label>
-                                <label class="block" x-data="{ foods: 1 }">
+                                <label class="block" x-data="{ foods: {{$meal->foods->pluck('id')}} }">
                                     <div class="flex justify-between">
                                         <span class="text-gray-700">@lang('Food')</span>
                                         <div>
-                                            <template x-if="foods > 1">
-                                                <button x-on:click="foods -= 1" type="button" class="bg-red-300 rounded-full px-2 text-white">-</button>
+                                            <template x-if="foods.length > 1">
+                                                <button x-on:click="foods.pop()" type="button" class="bg-red-300 rounded-full px-2 text-white">-</button>
                                             </template>
-                                            <button x-on:click="foods += 1" type="button" class="bg-green-300 rounded-full px-2 text-white">+</button>
+                                            <button x-on:click="foods.push(0)" type="button" class="bg-green-300 rounded-full px-2 text-white">+</button>
                                         </div>
                                     </div>
                                     <template x-for="food in foods">
-                                        <select  name="foods[]" class="
+                                        <select x-model="food"  name="foods[]" class="
                                                        block
                                                        w-full
                                                        mt-0

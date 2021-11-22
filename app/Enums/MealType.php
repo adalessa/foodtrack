@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+use Closure;
 use Spatie\Enum\Enum;
 
 /**
@@ -20,5 +21,12 @@ class MealType extends Enum
             'afternoon' => 3,
             'dinner' => 4,
         ];
+    }
+
+    protected static function labels(): Closure
+    {
+        return function(string $label): string {
+            return ucfirst($label);
+        };
     }
 }
