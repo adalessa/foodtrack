@@ -1,0 +1,6 @@
+{
+  "*": {
+    "start": "sail up -d",
+    "console": "sail tinker"
+  }
+}

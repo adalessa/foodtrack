@@ -8,7 +8,7 @@ use function Pest\Laravel\withoutExceptionHandling;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertEquals;
 
-it('returns the meals for the current month', function () {
+it('returns_the_meals_for_the_current_month', function () {
     /** @var User */
     $user = User::factory()
         ->withPersonalTeam()
