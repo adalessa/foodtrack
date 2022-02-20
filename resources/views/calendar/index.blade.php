@@ -28,7 +28,7 @@
                             @foreach($day->meals() as $meal)
                             <div class="rounded-md bg-blue-200 p-2 shadow-lg my-2">
                                 <a href="{{route('meals.edit', $meal)}}">
-                                    {{__($meal->type->label)}}
+                                    {{__($meal->type->label())}}
                                 </a>
                                 <ul class="list-inside list-disc">
                                     @foreach($meal->foods as $food)

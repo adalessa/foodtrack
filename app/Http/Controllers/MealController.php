@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MealType;
-use App\Models\Food;
 use App\Models\Meal;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class MealController extends Controller
 {
@@ -30,7 +30,7 @@ class MealController extends Controller
             'foods.*' => 'required|exists:foods,id',
             'type' => [
                 'required',
-                Rule::in(MealType::toValues()),
+                new Enum(MealType::class),
             ],
         ]);
 

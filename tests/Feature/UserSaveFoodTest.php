@@ -23,7 +23,7 @@ test('user can save a food for a meal in a date ', function () {
     actingAs($user)->post('/meals', [
         'date' => $date = now(),
         'foods' => [$food->id],
-        'type' => MealType::lunch()->value,
+        'type' => MealType::Lunch->value,
     ])->assertSessionDoesntHaveErrors()
         ->assertSessionHas('record', 1);
 
@@ -34,7 +34,7 @@ test('user can save a food for a meal in a date ', function () {
     expect($meal->date)->toBeInstanceOf(Carbon::class);
     expect($meal->date->isSameAs($date))->toBeTrue();
     expect($meal->type)->toBeInstanceOf(MealType::class);
-    expect($meal->type->value)->toBe(MealType::lunch()->value);
+    expect($meal->type->value)->toBe(MealType::Lunch->value);
 });
 
 test('user can update a meal', function () {

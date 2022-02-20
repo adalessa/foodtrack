@@ -16,6 +16,7 @@ class Meal extends Model
 
     protected $casts = [
         'date' => 'date',
+        'type' => MealType::class,
     ];
 
     public function scopeRange($query, $from, $to)
@@ -31,15 +32,5 @@ class Meal extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function getTypeAttribute($value)
-    {
-        return MealType::from($value);
-    }
-
-    public function setTypeAttribute(MealType $type)
-    {
-        $this->attributes['type'] = $type->value;
     }
 }
